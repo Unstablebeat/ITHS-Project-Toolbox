@@ -12,7 +12,7 @@ def cli():
     parser = argparse.ArgumentParser(description="---Toolbox---",)
 
     subparser = parser.add_subparsers(dest="tool")
-    nmap_parser = subparser.add_parser("nmap", help="'nmap -h' for more information")
+    nmap_parser = subparser.add_parser("scanner", help="'scanner -h' for more information")
     crypto_parser = subparser.add_parser("crypto", help="'crypto -h' for more information")
     ssh_parser = subparser.add_parser("ssh", help="'ssh -h' for more information")
 
@@ -79,7 +79,7 @@ def cli():
     nmap_parser.add_argument("-s",
                             dest="save",
                             metavar="save.txt",
-                            help="Used to save nmap output to file")
+                            help="Used to save scanner output to file")
 
     nmap_parser_group = nmap_parser.add_mutually_exclusive_group()
     nmap_parser_group.add_argument("-os",
@@ -89,7 +89,7 @@ def cli():
     nmap_parser_group.add_argument("-c",
                                     dest="custom",
                                     metavar="custom",
-                                    help="Enter custom flags(e.g ' -sV -Pn -p')")
+                                    help="Enter custom nmap flags(e.g ' -sV -Pn -p')")
     #-c flag requires a space after the first ' if only one flag is submitted to run
 
     crypto_parser.add_argument("-s",
@@ -145,7 +145,7 @@ def crypto(args):
         except FileNotFoundError as e:
             print(e)
 
-def nmap(args):
+def scanner(args):
     """Taking argparse input and calls the correct function"""
     targets = []
     save_file = []
@@ -166,7 +166,6 @@ def nmap(args):
     if args.os:
         _scan_os(targets, save_file)
     elif args.custom:
-        print(args.custom)
         _scan(targets, save_file, args.custom)
     else:
         _scan(targets, save_file)
@@ -216,8 +215,8 @@ def main():
     if args.tool == "crypto":
         crypto(args)
 
-    if args.tool == "nmap":
-        nmap(args)
+    if args.tool == "scanner":
+        scanner(args)
 
     if args.tool == "ssh":
         ssh_tool(args)
