@@ -48,7 +48,7 @@ def decrypt(enc_message, key, *args):
     plain_text_decoded = plain_text.decode()
 
     print('-------------------------------------')
-    print(f"Decrypted text:\n {plain_text_decoded}")
+    print(f"Decrypted text:\n{plain_text_decoded}")
     print('-------------------------------------')
     if args:                           #saves the result to a file if chosen as an argument
         with open(args[0], 'w') as save_file:
