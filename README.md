@@ -25,19 +25,20 @@ options:
   -os            Used to scan for os
   -c custom      Enter custom nmap flags(e.g ' -sV -Pn -p')
 ```
--We have the choice to scan a single ip-adress or multiple ip's given in a .txt file  
--Save the output of the scan to a file  
--Do a OS-Scan to see the most likely operating system  
--Use custom nmap flags (Altho the output will still be Hoststatus, Ports and services)  
+- We have the choice to scan a single ip-adress or multiple ip's given in a .txt file  
+- Save the output of the scan to a file  
+- Do a OS-Scan to see the most likely operating system  
+- Use custom nmap flags (Altho the output will still be Hoststatus, Protocol, Ports and services)  
 
 A few examples:  
 `python toolbox.py scanner 192.168.1.1 -s savefile.txt`  
 `python toolbox.py scanner -m targets.txt -os`  
 `python toolbox.py scanner -m targets.txt -s savefile.txt -c '-Pn -T4'`  
-`python toolbox.py scanner 192.168.1.1 -c ' -T4`
-I've noticed that when using the -c flag a space is needed after the first > ' < if only passing in one flag.  
+`python toolbox.py scanner 192.168.1.1 -c ' -T4'`  
+**NOTE:** I've noticed that when using the -c flag a space is needed  
+after the first > ' < if only passing in one flag.  
 
-Example output:
+Example output from just providing an IP:
 ```
 ----------------------------------
 Host: 255.255.255.0
@@ -47,6 +48,77 @@ Port: 22, State: open, Service: SSH
 ```
 
 ### 2. *Using cryptotool*
+To start use `python toolbox.py crypto -h` to see our options  
+```
+usage: toolbox.py crypto [-h] [-s save.txt] [-d File Key | -e File Key | -g [save.txt]]
+
+options:
+  -h, --help     show this help message and exit
+  -s save.txt    Used with decryption to save output to file
+  -d File Key    For Decryption add File and Key
+  -e File Key    For Encryption add File and Key
+  -g [save.txt]  Optional, enter a name for key-file
+```  
+- We have the choice to either Encrypt / Decrypt a file or generate a key.  
+- When encrypting a file it will replace the original file with a new one ending in .enc
+- By default Decryption will print out into the terminal, if we want to save the output to a file we use -s savefile.txt.
+ 
+A few examples:  
+`python toolbox.py crypto -g`  
+**WARNING:** Running this twice will overwrite the first default.key and the same key used for encryption is needed to decrypt!
+```
+python toolbox.py crypto -g
+---------------------------------
+Key saved as: default.key
+Key: Tv_gi4t19-Bl0-7b7ZhYA9axMt08K7Bgl0nnEO2qbmc=
+```
+
+
+`python toolbox.py crypto -g my`  
+```
+python toolbox.py crypto -g my
+---------------------------------
+Key saved as: my.key
+Key: 6WOQCRCeinqP8KyfsJSKf-jbFSy2CCe8EDUovX5pglc=
+```
+
+
+`python toolbox.py crypto -e test.txt my.key`
+```
+python toolbox.py crypto -e test.txt default.key
+-------------------------------------
+Key: Tv_gi4t19-Bl0-7b7ZhYA9axMt08K7Bgl0nnEO2qbmc=
+-------------------------------------
+Encrypted text: b'gAAAAABnIhOnWcNJAIBbV31nIKzB75-B_g9WgzV8GY5DqSZGx_iUofXaSgRlo5X_Y-H3S8cUAG-lauDdTT6Ec6GmZ1BRGf5ycA=='
+-------------------------------------
+File: test.txt > test_txt.enc
+```
+
+`python toolbox.py crypto -d yourfile.txt default.key`
+```
+python toolbox.py crypto -d test_txt.enc default.key
+-------------------------------------
+Key: Tv_gi4t19-Bl0-7b7ZhYA9axMt08K7Bgl0nnEO2qbmc=
+-------------------------------------
+Decrypted text:
+This is a test!
+-------------------------------------
+```
+
+`python toolbox.py crypto -d yourfile.txt default.key -s savefile.txt`
+```
+python toolbox.py crypto -d test_txt.enc default.key -s test.txt
+-------------------------------------
+Key: Tv_gi4t19-Bl0-7b7ZhYA9axMt08K7Bgl0nnEO2qbmc=
+-------------------------------------
+Decrypted text:
+This is a test!
+-------------------------------------
+
+Decryption saved as a copy: test.txt
+```
+
+### 3. *Using SSH Automation*
 
 ## Port scanner
 A Simple Port Scanner using nmap. This tool os ised tp scan a network for open ports and identify potential security risks.
