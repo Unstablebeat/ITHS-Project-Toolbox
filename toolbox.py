@@ -44,6 +44,10 @@ def cli():
                             metavar=("l_path", "r_path"),
                             help="Download file/s to local path from remote path")
 
+    ssh_parser.add_argument("-s",
+                            dest="sleep",
+                            action="store_true",
+                            help="Used with bruteforce, enabels sleeptime after every 5 attempts")
 
     ssh_parser_group = ssh_parser.add_mutually_exclusive_group()
     ssh_parser_group.add_argument("-b",
@@ -65,8 +69,8 @@ def cli():
 
     ssh_parser_group.add_argument("-c",
                             dest="command",
-                            metavar="df -h",
-                            help="To run commands after connection (e.g: 'df -h' whoami)")
+                            metavar="commandfile",
+                            help="To run commands after connection from a file")
 
 
     nmap_parser.add_argument("target",
@@ -194,15 +198,24 @@ def ssh_tool(args):
 
     if args.bf_password:
         passwords = args.bf_password
-        ssh.ssh_brute_password(ip, username, passwords)
+        if args.sleep:
+            ssh.ssh_brute_password(ip, username, passwords, True)
+        else:
+            ssh.ssh_brute_password(ip, username, passwords)
 
     if args.bf_password_grabfiles:
         passwords, local_path, remote_path = args.bf_password_grabfiles
-        ssh.ssh_brute_grab(ip, username, passwords, local_path, remote_path)
+        if args.sleep:
+            ssh.ssh_brute_grab(ip, username, passwords, local_path, remote_path, True)
+        else:
+            ssh.ssh_brute_grab(ip, username, passwords, local_path, remote_path)
 
     if args.bf_user_password:
         usernames, passwords = args.bf_user_password
-        ssh.ssh_brute_user_password(ip, usernames, passwords)
+        if args.sleep:
+            ssh.ssh_brute_user_password(ip, usernames, passwords, True)
+        else:
+            ssh.ssh_brute_user_password(ip, usernames, passwords)
 
 
 def main():

