@@ -1,3 +1,6 @@
+"""
+Importing python-nmap to use for scanning ports
+"""
 import nmap
 
 def _scan_os(ip_list, save_settings):
@@ -23,7 +26,7 @@ def _scan_os(ip_list, save_settings):
             os_result = f"OS: {nm[host]['osmatch'][0]['name']} Accuracy: {nm[host]['osmatch'][0]['accuracy']}"
             print(line + "\n" + host_result + "\n" + state_result + "\n" + os_result + "\n")
             if save_file:
-                with open(save_file, 'a') as file:
+                with open(save_file, 'a', encoding='UTF-8') as file:
                     file.write(line + "\n")
                     file.write(host_result + "\n")
                     file.write(state_result + "\n")
@@ -59,7 +62,7 @@ def _scan(ip_list, save_settings, *args):
             state_result = f"State: {nm[host].state()}"
             print(line + "\n" + host_result + "\n" + state_result)
             if save_file:
-                with open(save_file, 'a') as file:
+                with open(save_file, 'a', encoding='UTF-8') as file:
                     file.write(line + "\n")
                     file.write(host_result + "\n")
                     file.write(state_result + "\n")
@@ -68,14 +71,14 @@ def _scan(ip_list, save_settings, *args):
                 proto_result = f"Protocol: {proto}"
                 print(proto_result)
                 if save_file:
-                    with open(save_file, 'a') as file:
+                    with open(save_file, 'a', encoding='UTF-8') as file:
                         file.write(proto_result + "\n")
                 ports = nm[host][proto].keys()
                 for port in ports:
                     port_result = f"Port: {port}, State: {nm[host][proto][port]['state']}, Service: {nm[host][proto][port]['name']}"
                     print(port_result)
                     if save_file:
-                        with open(save_file, 'a') as file:
+                        with open(save_file, 'a', encoding='UTF-8') as file:
                             file.write(port_result + "\n")
     if save_file:
         print('----------------------------------')
