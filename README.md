@@ -1,5 +1,5 @@
 # Project Toolbox
-This toolbox contains 3 different tools written in Python and is designed for penetration testing. All the tools can be used from `toolbox.py` or used individually.
+This toolbox contains 3 different tools written in Python and is designed for penetration testing and to find potential security risks. All the tools can be used from `toolbox.py`.
 - ***Port scanner***  
 - ***Cryptotool***
 - ***SSH Automation***
@@ -229,7 +229,7 @@ Successful login with kali-kali
 
 `Python toolbox.py ssh ip username -bg passwords.txt C:\Path\to\local\folder files.txt`
 ```
-python .\toolbox.py ssh 192.168.1.1 kali -bg .\passwords.txt D:\Python\Misc\ path.txt
+python toolbox.py ssh 192.168.1.1 kali -bg passwords.txt D:\Python\Misc\ path.txt
 Trying to bruteforce password on 192.168.1.1 as kali
 Trying kali-admin
 Failed with kali - admin
@@ -248,34 +248,6 @@ Error: Could not download ~/.zsh_history. Reason: [Errno 2] No such file
 Downloaded /home/kali/Documents/test.txt to D:\Python\Misc\test.txt
 Error: Could not download /etc/shadow. Reason: [Errno 13] Permission denied
 ```
-
-## Port scanner
-A Simple Port Scanner using nmap. This tool os ised tp scan a network for open ports and identify potential security risks.
-- ***Host-status***
-- ***Open ports***
-- ***Service***
-- ***Operating-System***
-- ***Optional nmap flags*** (Output will still only show host-status, ports and services)
-#### Usage
-TODO-Instructions
-
-## Cryptotool
-A crypto-tool that can Encrypt and Decrypt files with a key that can also be generated with this tool
-- ***Key Generator***
-- ***Encryption***
-- ***Decryption***
-#### Usage
-TODO-Instrucions
-
-## SSH Automation
-A tool for SSH Automation to upload/download a file or all files in a directory, bruteforce SSH password or username and password, bruteforce a password and also grab specific files given from a filelist.
-- ***Upload files***
-- ***Download files***
-- ***Bruteforce passwords***
-- ***Bruteforce usernames and passwords***
-- ***Bruteforce and grab specified files***
-#### Usage
-TODO-Instructions
 
 ## Contribution
 To contribute
