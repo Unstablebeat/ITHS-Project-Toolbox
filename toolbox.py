@@ -1,5 +1,7 @@
 """
-comments for modules.
+argparse module providing the ability to take arguments in the commandline.
+
+importing selfmade cryptotool, keygenerator, ssh and scan to call functions
 """
 import argparse
 import cryptotool
@@ -23,7 +25,7 @@ def cli():
 
     ssh_parser.add_argument("password",
                             nargs='?',
-                            help="Enter password for ssh-connection unless -b/-bu is used")
+                            help="Enter password for ssh-connection unless -b/-bu/-bg is used")
 
     ssh_parser.add_argument("-u",
                             dest="upload",
@@ -129,8 +131,7 @@ def crypto(args):
         keygenerator.key_gen(args.generatekey)
     elif args.decryption:
         try:
-            file = args.decryption[0]
-            key = args.decryption[1]
+            file, key = args.decryption
             if args.save:
                 cryptotool.decrypt(file, key, args.save)
             else:
@@ -139,8 +140,7 @@ def crypto(args):
             print(e)
     elif args.encryption:
         try:
-            file = args.encryption[0]
-            key = args.encryption[1]
+            file, key = args.encryption
             cryptotool.encrypt(file, key)
         except FileNotFoundError as e:
             print(e)
@@ -158,7 +158,7 @@ def scanner(args):
 
     if args.multiple:
         try:
-            with open(args.multiple[0], 'r') as ip_file:
+            with open(args.multiple[0], 'r', encoding='UTF-8') as ip_file:
                 targets = ip_file.read().splitlines()
         except FileNotFoundError as e:
             print(e)
@@ -171,7 +171,7 @@ def scanner(args):
         _scan(targets, save_file)
 
 def ssh_tool(args):
-    """ ---#TODO#--- """
+    """Taking argparse input and calls the correct function"""
     ip = args.ip
     username = args.username
     pwd = args.password
@@ -197,14 +197,11 @@ def ssh_tool(args):
         ssh.ssh_brute_password(ip, username, passwords)
 
     if args.bf_password_grabfiles:
-        passwords = args.bf_password_grabfiles[0]
-        local_path = args.bf_password_grabfiles[1]
-        remote_path = args.bf_password_grabfiles[2]
+        passwords, local_path, remote_path = args.bf_password_grabfiles
         ssh.ssh_brute_grab(ip, username, passwords, local_path, remote_path)
 
     if args.bf_user_password:
-        usernames = args.bf_user_password[0]
-        passwords = args.bf_user_password[1]
+        usernames, passwords = args.bf_user_password
         ssh.ssh_brute_user_password(ip, usernames, passwords)
 
 
