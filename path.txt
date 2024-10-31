@@ -1,0 +1,6 @@
+### Example paths ###
+/etc/passwd
+/var/log/auth.log
+/home/kali/Documents/file.txt
+------------------------------
+If you wish to use this file, clear this file and add your own paths.
