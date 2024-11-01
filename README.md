@@ -292,7 +292,7 @@ Uploaded D:\test.txt to /home/kali/Documents/test/test.txt
 ```
 
 ### ***Final Note:*** The -s flag.
-The -s flag is used in tandem with any of the bruteforce options, applying -s will put a timeout on the bruteforce if it fails 5 attempts without breaking the password, this will make bruteing username and password take a tremendous amount because the timeouts goes 1min -> 5min -> 10min -> 30min between attempts.   
+The -s flag is used in tandem with any of the bruteforce options, applying -s will put a timeout on the bruteforce if it fails 5 attempts without breaking the password, this will make bruteforceing username and password take a tremendous amount of time because the timeouts goes 1min -> 5min -> 10min -> 30min between attempts.   
 
 
 ## Contribution
