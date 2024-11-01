@@ -55,17 +55,23 @@ def cli():
                             metavar="passwordlist",
                             help="Bruteforce password, submit passwordlist")
 
-    ssh_parser_group.add_argument("-bu",
+    ssh_parser_group.add_argument("-bup",
                             dest="bf_user_password",
                             nargs=2,
                             metavar=("users", "passwords"),
                             help="Bruteforce username and password, submit user and passwordlists")
 
-    ssh_parser_group.add_argument("-bg",
-                            dest="bf_password_grabfiles",
+    ssh_parser_group.add_argument("-bd",
+                            dest="bf_password_downloadfiles",
                             nargs=3,
                             metavar=("passwords", "l_path", "r_path"),
                             help="Bruteforce password and download files from a list.txt")
+
+    ssh_parser_group.add_argument("-bu",
+                                dest="bf_password_uploadfiles",
+                                nargs=3,
+                                metavar=("passwords", "l_path", "r_path"),
+                                help="Bruteforce password and uploads files from a list.txt")
 
     ssh_parser_group.add_argument("-c",
                             dest="command",
@@ -82,6 +88,7 @@ def cli():
                              nargs=1,
                              metavar="ipfile.txt",
                              help="Scan a list of ip's in a file")
+
     nmap_parser.add_argument("-s",
                             dest="save",
                             metavar="save.txt",
@@ -97,6 +104,7 @@ def cli():
                                     metavar="custom",
                                     help="Enter custom nmap flags(e.g ' -sV -Pn -p')")
     #-c flag requires a space after the first ' if only one flag is submitted to run
+
 
     crypto_parser.add_argument("-s",
                                 dest="save",
@@ -130,7 +138,7 @@ def cli():
     return args
 
 def crypto(args):
-    """Taking argparse input and calls the correct function"""
+    """Taking argparse input and calls the correct crypto function"""
     if args.generatekey:
         keygenerator.key_gen(args.generatekey)
     elif args.decryption:
@@ -150,7 +158,7 @@ def crypto(args):
             print(e)
 
 def scanner(args):
-    """Taking argparse input and calls the correct function"""
+    """Taking argparse input and calls the correct scanner function"""
     targets = []
     save_file = []
 
@@ -175,7 +183,7 @@ def scanner(args):
         _scan(targets, save_file)
 
 def ssh_tool(args):
-    """Taking argparse input and calls the correct function"""
+    """Taking argparse input and calls the correct ssh function"""
     ip = args.ip
     username = args.username
     pwd = args.password
@@ -203,8 +211,8 @@ def ssh_tool(args):
         else:
             ssh.ssh_brute_password(ip, username, passwords)
 
-    if args.bf_password_grabfiles:
-        passwords, local_path, remote_path = args.bf_password_grabfiles
+    if args.bf_password_downloadfiles:
+        passwords, local_path, remote_path = args.bf_password_downloadfiles
         if args.sleep:
             ssh.ssh_brute_grab(ip, username, passwords, local_path, remote_path, True)
         else:
@@ -217,6 +225,12 @@ def ssh_tool(args):
         else:
             ssh.ssh_brute_user_password(ip, usernames, passwords)
 
+    if args.bf_password_uploadfiles:
+        passwords, local_path, remote_path = args.bf_password_uploadfiles
+        if args.sleep:
+            ssh.ssh_brute_put(ip, username, passwords, local_path, remote_path, True)
+        else:
+            ssh.ssh_brute_put(ip, username, passwords, local_path, remote_path)
 
 def main():
     """Mainscript for running the toolbox"""
