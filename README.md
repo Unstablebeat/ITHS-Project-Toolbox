@@ -1,5 +1,6 @@
 # Project Toolbox
-This toolbox contains 3 different tools written in Python and is designed for penetration testing and to find potential security risks. All the tools can be used from `toolbox.py`.
+This toolbox contains 3 different tools written in Python and is designed for penetration testing and to find potential security risks.  
+All the tools can be used from `toolbox.py`.
 - ***Port scanner***  
 - ***Cryptotool***
 - ***SSH Automation***
@@ -126,9 +127,11 @@ Decryption saved as a copy: test.txt
 
 ### 3. *Using SSH Automation*
 To start use `python toolbox.py ssh -h` to see our options
+
 ```
-python toolbox.py ssh -h                                     
-usage: toolbox.py ssh [-h] [-u l_File r_Path] [-a] [-d l_path r_path] [-b passwordlist | -bu users passwords | -bg passwords l_path r_path | -c df -h] ip [username] [password]
+python toolbox.py ssh -h                                                                             
+usage: toolbox.py ssh [-h] [-u l_File r_Path] [-a] [-d l_path r_path] [-s] [-b passwordlist | -bup users passwords | -bd passwords l_path r_path | -bu passwords l_path r_path | -c commandfile]
+                      ip [username] [password]
 
 positional arguments:
   ip                    Enter ip for ssh-connection
@@ -140,12 +143,16 @@ options:
   -u l_File r_Path      Upload local file/s to remote path
   -a                    If used, targets all files in a dir
   -d l_path r_path      Download file/s to local path from remote path
+  -s                    Used with bruteforce, enabels sleeptime after every 5 attempts
   -b passwordlist       Bruteforce password, submit passwordlist
-  -bu users passwords   Bruteforce username and password, submit user and passwordlists
-  -bg passwords l_path r_path
+  -bup users passwords  Bruteforce username and password, submit user and passwordlists
+  -bd passwords l_path r_path
                         Bruteforce password and download files from a list.txt
-  -c df -h              To run commands after connection (e.g: 'df -h' whoami)
+  -bu passwords l_path r_path
+                        Bruteforce password and uploads files from a list.txt
+  -c commandfile        To run commands after connection from a file
 ```
+
 - Upload a specific file.
 - Upload everything in a folder, including subfolders with the -a flag.
 - Download a specific file.
@@ -153,18 +160,24 @@ options:
 - Bruteforce ssh password.
 - Bruteforce ssh username and password.
 - Bruteforce ssh password aswell as grabing predetermined files submitted via .txt file.
+- Bruteforce ssh password aswell as uploading predetermined files submitted via .txt file.
 - Connect via ssh and run commands submitted via .txt file.
 
 #### A few examples with output:  
 
 `Python toolbox.py ssh ip username password -u C:\Path\to\local\file.txt /Path/to/remote/file.txt`
+
 ```
 python toolbox.py ssh 192.168.1.1 kali kali -u D:\Python\Misc\test.txt /home/kali/Documents/remote_test.txt
 Connected to 192.168.1.1 as kali
 The file: D:\Python\Misc\test.txt has been uploaded to /home/kali/Documents/remote_test.txt
 ```
-***Note:*** If the file you wish to upload/(download path) is in the same directory as the script you do not need to specify the path (e.g `-u test.txt /home/kali/Documents/remote_test.txt`)
+***Note:*** If the file you wish to upload/(download path) is in the same directory as the script you do not need to specify the path  
+(e.g `-u test.txt /home/kali/Documents/remote_test.txt`)
+
+
 <hr>
+
 
 `Python toolbox.py ssh ip username password -d C:\Path\to\local\folder /Path/to/remote/folder -a`
 ```
@@ -176,7 +189,9 @@ The file: /home/kali/Documents/world.txt has been downloaded to D:\Python\Misc\w
 The file: /home/kali/Documents/A_folder/file_in_folder.txt has been downloaded to D:\Python\Misc\A_folder\file_in_folder.txt
 ```  
 
+
 <hr>
+
 
 `Python toolbox.py ssh ip username -b passwords.txt`
 ```
@@ -194,7 +209,9 @@ Trying kali-kali
 Successful login with kali-kali
 ```
 
+
 <hr>
+
 
 `Python toolbox.py ssh ip username password -c commands.txt`  
 ***Note:*** The commands.txt only contains 'whoami' but you can have a file with multiple commands and it will execute them line by line
@@ -204,11 +221,13 @@ Connected to 192.168.199.128 as kali
 kali
 ```
 
+
 <hr>
 
-`Python toolbox.py ssh ip username -bu users.txt passwords.txt`
+
+`Python toolbox.py ssh ip username -bup users.txt passwords.txt`
 ```
-python toolbox.py ssh 192.168.1.1 -bu usernames.txt passwords.txt
+python toolbox.py ssh 192.168.1.1 -bup usernames.txt passwords.txt
 Trying to bruteforce username and password on 192.168.1.1
 Trying admin-admin
 Failed with admin - admin
@@ -227,9 +246,10 @@ Successful login with kali-kali
 
 <hr>
 
-`Python toolbox.py ssh ip username -bg passwords.txt C:\Path\to\local\folder files.txt`
+
+`Python toolbox.py ssh ip username -bd passwords.txt C:\Path\to\local\folder files.txt`
 ```
-python toolbox.py ssh 192.168.1.1 kali -bg passwords.txt D:\Python\Misc\ path.txt
+python toolbox.py ssh 192.168.1.1 kali -bd passwords.txt D:\Python\Misc\ path.txt
 Trying to bruteforce password on 192.168.1.1 as kali
 Trying kali-admin
 Failed with kali - admin
@@ -248,6 +268,32 @@ Error: Could not download ~/.zsh_history. Reason: [Errno 2] No such file
 Downloaded /home/kali/Documents/test.txt to D:\Python\Misc\test.txt
 Error: Could not download /etc/shadow. Reason: [Errno 13] Permission denied
 ```
+
+<hr>
+
+`Python toolbox.py ssh ip username -bu passwords.txt files.txt /path/to/upload`
+```
+python toolbox.py ssh 192.168.1.1 kali -bu passwords.txt test.txt /home/kali/Documents/test/
+Trying to bruteforce password on 192.168.1.1 as kali
+Trying kali-admin
+Failed with kali - admin
+----------------------------
+Trying kali-password
+Failed with kali - password
+----------------------------
+Trying kali-kali
+
+----------------------------
+Successful login with kali-kali
+----------------------------
+
+Uploaded D:\Test\test1.txt to /home/kali/Documents/test/test1.txt
+Uploaded D:\test.txt to /home/kali/Documents/test/test.txt
+```
+
+### ***Final Note:*** The -s flag.
+The -s flag is used in tandem with any of the bruteforce options, applying -s will put a timeout on the bruteforce if it fails 5 attempts without breaking the password, this will make bruteing username and password take a tremendous amount because the timeouts goes 1min -> 5min -> 10min -> 30min between attempts.   
+
 
 ## Contribution
 To contribute
