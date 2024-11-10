@@ -9,6 +9,7 @@ All the tools can be used from `toolbox.py`.
 ```git clone https://github.com/Unstablebeat/ITHS-Project-Toolbox.git```
 2. Install the required libraries  
 ```pip install -r requirements.txt```
+**Note:** To use port scanner you need to have nmap installed, you can download [Nmap](https://nmap.org/download) here
 ## Usage
 ### 1. *Using port scanner*  
 
